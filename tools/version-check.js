@@ -61,4 +61,20 @@ function checkForChanges() {
   }
 }
 
+// Check if the Git working directory is clean
+function isGitClean() {
+  try {
+    const status = execSync('git status --porcelain', { encoding: 'utf8' });
+    return status.trim() === '';
+  } catch (gitError) {
+    console.error('[ERROR] Failed to check Git status:', gitError.message);
+    return false;
+  }
+}
+
+if (!isGitClean()) {
+  console.warn('Git working directory is not clean. Please commit or stash your changes before running this script.');
+  process.exit(1);
+}
+
 checkForChanges();
