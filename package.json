@@ -26,7 +26,8 @@
     "prepackage": "webpack --mode production --devtool hidden-source-map",
     "compile": "webpack",
     "watch": "webpack --watch",
-    "package": "vsce package",
+    "prepackage-version-check": "node tools/version-check.js",
+    "package": "npm run prepackage-version-check && vsce package",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
@@ -45,5 +46,6 @@
     "webpack-cli": "^6.0.1",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
-  }
+  },
+  "publisher": "your-publisher-name"
 }
