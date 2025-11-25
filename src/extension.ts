@@ -12,6 +12,23 @@ export function activate(context: vscode.ExtensionContext) {
 	// Create a logs directory in the workspace
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders && workspaceFolders.length > 0) {
+		console.log(`[DEBUG] Workspace folder path: ${workspaceFolders[0].uri.fsPath}`);
+		if (!fs.existsSync(workspaceFolders[0].uri.fsPath)) {
+			console.error('[ERROR] Workspace folder path is invalid or inaccessible.');
+			vscode.window.showErrorMessage('Workspace folder path is invalid or inaccessible. Logs cannot be created.');
+			return;
+		}
+
+		// Check write permissions for the workspace folder
+		try {
+			fs.accessSync(workspaceFolders[0].uri.fsPath, fs.constants.W_OK);
+			console.log('[DEBUG] Write permissions verified for workspace folder.');
+		} catch (permissionError: any) {
+			console.error('[ERROR] No write permissions for workspace folder:', permissionError.message);
+			vscode.window.showErrorMessage('No write permissions for workspace folder. Logs cannot be created.');
+			return;
+		}
+
 		const logsDir = path.join(workspaceFolders[0].uri.fsPath, 'logs');
 		try {
 			if (!fs.existsSync(logsDir)) {
