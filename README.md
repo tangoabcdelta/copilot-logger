@@ -42,4 +42,17 @@ This extension does not currently provide any configurable settings.
 
 - Added automatic logging of Copilot interactions.
 
----
+### Testing the Extension
+
+To test the extension against a specific workspace, update the `launch.json` file:
+
+1. Locate the `--extensionDevelopmentPath` argument in the `Run Extension` configuration.
+2. Replace the default `${workspaceFolder}` with the path to your desired workspace. For example:
+
+   ```json
+   "args": [
+       "--extensionDevelopmentPath=~/Documents/PROJECTS/playing-with-github-apis"
+   ]
+   ```
+
+   Use `~` to represent the home directory for portability.
