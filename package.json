@@ -4,7 +4,7 @@
   "description": "Logs Copilot interactions (inputs and outputs) into a file for auditing purposes.",
   "version": "0.0.2",
   "engines": {
-    "vscode": "^1.106.1"
+    "vscode": "^1.60.0"
   },
   "categories": [
     "Other"
@@ -27,8 +27,8 @@
     "compile": "webpack",
     "watch": "webpack --watch",
     "prepackage-version-check": "node tools/version-check.js",
-    "package2": "npm run prepackage-version-check && vsce package",
-    "package": "vsce package",
+    "package": "npm run prepackage-version-check && vsce package",
+    "only:package": "vsce package",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",

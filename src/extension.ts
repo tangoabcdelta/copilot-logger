@@ -9,6 +9,20 @@ import * as path from 'path';
 export function activate(context: vscode.ExtensionContext) {
 	console.log('[DEBUG] Activating Copilot Logger extension...');
 
+	// Show a popup to confirm activation and monitoring
+	vscode.window.showInformationMessage('Copilot Logger activated and monitoring your Copilot chat.');
+
+	// Listen for Copilot chat interactions
+	vscode.workspace.onDidChangeTextDocument((event) => {
+		const editor = vscode.window.activeTextEditor;
+		if (editor && event.document === editor.document) {
+			const content = event.document.getText();
+			if (content.includes('copilot')) { // Example condition to detect Copilot-related text
+				vscode.window.showInformationMessage(`You asked for: ${content}`);
+			}
+		}
+	});
+
 	// Create a logs directory in the workspace
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders && workspaceFolders.length > 0) {
@@ -32,6 +46,17 @@ export function activate(context: vscode.ExtensionContext) {
 		const logsDir = path.join(workspaceFolders[0].uri.fsPath, 'logs');
 		try {
 			if (!fs.existsSync(logsDir)) {
+				// Additional debug log to verify logs directory path
+				console.log(`[DEBUG] Attempting to create logs directory at: ${logsDir}`);
+
+				// Ensure the parent directory exists before creating the logs directory
+				const parentDir = path.dirname(logsDir);
+				if (!fs.existsSync(parentDir)) {
+					console.error(`[ERROR] Parent directory does not exist: ${parentDir}`);
+					vscode.window.showErrorMessage(`Parent directory does not exist: ${parentDir}. Logs cannot be created.`);
+					return;
+				}
+
 				fs.mkdirSync(logsDir, { recursive: true });
 				console.log(`[DEBUG] Created logs directory at: ${logsDir}`);
 				vscode.window.showInformationMessage(`Logs directory created at: ${logsDir}`);
