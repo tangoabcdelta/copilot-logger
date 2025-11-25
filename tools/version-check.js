@@ -1,17 +1,42 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
+const path = require('path');
 
 const checksumFile = '.checksum';
 const sourceFiles = ['src', 'package.json', 'webpack.config.js']; // Add other relevant files
+
+// Recursively collect all file paths within a directory
+function collectFiles(dir) {
+  let files = [];
+  const items = fs.readdirSync(dir, { withFileTypes: true });
+  items.forEach((item) => {
+    const fullPath = path.join(dir, item.name);
+    if (item.isDirectory()) {
+      files = files.concat(collectFiles(fullPath));
+    } else {
+      files.push(fullPath);
+    }
+  });
+  return files;
+}
 
 // Generate a checksum for the specified files
 function generateChecksum() {
   const hash = crypto.createHash('sha256');
   sourceFiles.forEach((file) => {
     if (fs.existsSync(file)) {
-      const fileContent = fs.readFileSync(file);
-      hash.update(fileContent);
+      const stats = fs.statSync(file);
+      if (stats.isDirectory()) {
+        const files = collectFiles(file);
+        files.forEach((f) => {
+          const fileContent = fs.readFileSync(f);
+          hash.update(fileContent);
+        });
+      } else {
+        const fileContent = fs.readFileSync(file);
+        hash.update(fileContent);
+      }
     }
   });
   return hash.digest('hex');
