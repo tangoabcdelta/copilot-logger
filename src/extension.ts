@@ -13,17 +13,39 @@ export function activate(context: vscode.ExtensionContext) {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (workspaceFolders && workspaceFolders.length > 0) {
 		const logsDir = path.join(workspaceFolders[0].uri.fsPath, 'logs');
-		if (!fs.existsSync(logsDir)) {
-			fs.mkdirSync(logsDir);
-			console.log(`[DEBUG] Created logs directory at: ${logsDir}`);
-		}
+		try {
+			if (!fs.existsSync(logsDir)) {
+				fs.mkdirSync(logsDir);
+				console.log(`[DEBUG] Created logs directory at: ${logsDir}`);
+				vscode.window.showInformationMessage(`Logs directory created at: ${logsDir}`);
+			}
 
-		// Write a log file
-		const logFile = path.join(logsDir, `log-${new Date().toISOString()}.txt`);
-		fs.writeFileSync(logFile, 'Copilot Logger activated.\n', { flag: 'a' });
-		console.log(`[DEBUG] Log file created: ${logFile}`);
+			// Write a log file
+			const logFile = path.join(logsDir, `log-${new Date().toISOString()}.txt`);
+			fs.writeFileSync(logFile, 'Copilot Logger activated.\n', { flag: 'a' });
+			console.log(`[DEBUG] Log file created: ${logFile}`);
+		} catch (error: any) {
+			console.error(`[ERROR] Failed to create logs directory or write log file: ${error.message}`);
+			vscode.window.showErrorMessage(`Failed to create logs directory or write log file: ${error.message}`);
+		}
 	} else {
 		console.error('[ERROR] No workspace folder found. Logs cannot be created.');
+		vscode.window.showWarningMessage('No workspace folder found. Logs cannot be created. Would you like to create a default directory for logs?', 'Yes', 'No')
+			.then(selection => {
+				if (selection === 'Yes') {
+					const defaultDir = path.join(__dirname, 'logs');
+					try {
+						if (!fs.existsSync(defaultDir)) {
+							fs.mkdirSync(defaultDir);
+							console.log(`[DEBUG] Default logs directory created at: ${defaultDir}`);
+							vscode.window.showInformationMessage(`Default logs directory created at: ${defaultDir}`);
+						}
+					} catch (error: any) {
+						console.error(`[ERROR] Failed to create default logs directory: ${error.message}`);
+						vscode.window.showErrorMessage(`Failed to create default logs directory: ${error.message}`);
+					}
+				}
+			});
 	}
 
 	// The command has been defined in the package.json file

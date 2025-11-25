@@ -104,6 +104,11 @@ The primary objective of this project was to create a VS Code extension named "C
    - Verified that the extension activates correctly and generates logs as expected.
    - Ensured that the development workflow is efficient, with minimal manual intervention required.
 
+6. **Handling Missing Workspace Folders**
+   - Implemented a feature to handle cases where no workspace folder is open.
+   - Displays a warning message if no workspace folder is found.
+   - Prompts the user with an option to create a default logs directory.
+
 ### Lessons Learned
 
 - Automating repetitive tasks, such as builds, significantly improves the development experience and reduces errors.
