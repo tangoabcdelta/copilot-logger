@@ -40,6 +40,11 @@ class Logger {
 			const newContent = `[${timestamp}] ${content}\n` + existingContent;
 			fs.writeFileSync(this.logFilePath, newContent, 'utf-8');
 			console.log(`[DEBUG] Log written to: ${this.logFilePath}`);
+
+			// Open the log file in the active editor
+			vscode.workspace.openTextDocument(this.logFilePath).then((doc) => {
+				vscode.window.showTextDocument(doc);
+			});
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 			console.error(`[ERROR] Failed to write to log file: ${errorMessage}`);
