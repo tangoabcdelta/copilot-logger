@@ -4,14 +4,12 @@
   "description": "Logs Copilot interactions (inputs and outputs) into a file for auditing purposes.",
   "version": "0.0.2",
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.106.1"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "*"
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
