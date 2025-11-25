@@ -26,6 +26,24 @@ The **Copilot Logger** is a Visual Studio Code extension designed to monitor and
 
 3. Logs will be automatically generated in the `logs/` directory of your workspace.
 
+## Logging Details
+
+### Log File Name
+
+The extension writes all logs to a single file named `copilot-activity-log.txt`. This file is located in the `logs/` directory within the extension's root directory.
+
+### How It Works
+
+1. **Activation:** When the extension is activated, it initializes a `Logger` class to handle all logging operations.
+2. **Log File Check:** The extension ensures that the `logs/` directory and the `copilot-activity-log.txt` file exist. If they do not, warnings are displayed to the user.
+3. **Logging Interactions:** The extension listens for changes in the active text editor. If any content related to Copilot is detected, it logs the interaction with a timestamp.
+4. **Prepending Logs:** New log entries are prepended to the log file, ensuring the latest activity appears at the top.
+
+### Important Notes
+
+- If the `logs/` directory or `copilot-activity-log.txt` file is missing, the extension will not create them automatically. Users must create these manually if prompted.
+- Ensure the workspace is trusted to enable file writing operations.
+
 ## Extension Settings
 
 This extension does not currently provide any configurable settings.
