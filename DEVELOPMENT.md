@@ -37,10 +37,10 @@ This guide provides instructions for developers working on the **Copilot Logger*
    Run the following command in the root of the project:
 
    ```bash
-   vsce package
+   npm run package
    ```
 
-   The `.vsix` file will be created in the root directory of the project.
+   This will trigger the `prepackage` script to bundle the extension using Webpack and then use `vsce package` to generate the `.vsix` file. The `.vsix` file will be created in the root directory of the project.
 
 ---
 
