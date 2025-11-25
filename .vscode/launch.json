@@ -11,7 +11,7 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=~/Documents/PROJECTS/playing-with-github-apis"
+				"--extensionDevelopmentPath=${env:HOME}/Documents/PROJECTS/playing-with-github-apis"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -24,7 +24,7 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=~/Documents/PROJECTS/playing-with-github-apis",
+				"--extensionDevelopmentPath=${env:HOME}/Documents/PROJECTS/playing-with-github-apis",
 				"--extensionTestsPath=${workspaceFolder}/dist/test/suite/index.js"
 			],
 			"outFiles": [
