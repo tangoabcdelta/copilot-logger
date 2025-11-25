@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const logsDir = path.join(workspaceFolders[0].uri.fsPath, 'logs');
 		try {
 			if (!fs.existsSync(logsDir)) {
-				fs.mkdirSync(logsDir);
+				fs.mkdirSync(logsDir, { recursive: true });
 				console.log(`[DEBUG] Created logs directory at: ${logsDir}`);
 				vscode.window.showInformationMessage(`Logs directory created at: ${logsDir}`);
 			}
@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 					const defaultDir = path.join(__dirname, 'logs');
 					try {
 						if (!fs.existsSync(defaultDir)) {
-							fs.mkdirSync(defaultDir);
+							fs.mkdirSync(defaultDir, { recursive: true });
 							console.log(`[DEBUG] Default logs directory created at: ${defaultDir}`);
 							vscode.window.showInformationMessage(`Default logs directory created at: ${defaultDir}`);
 						}
