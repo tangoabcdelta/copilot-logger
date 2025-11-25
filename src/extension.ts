@@ -4,6 +4,12 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+/**
+ * This method is called when your extension is activated.
+ * The activation happens the very first time the command is executed.
+ *
+ * @param context - The extension context provided by VS Code.
+ */
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
