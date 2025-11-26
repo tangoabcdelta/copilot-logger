@@ -147,12 +147,18 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 - **Contact:**
 
   - Developer: Deveedutta Maharana
-  - Email: deveedutta@gmail.com
+  - Email: <deveedutta@gmail.com>
 
 ---
 
 ## Overview
+
 The **Copilot Logger** is a Visual Studio Code extension designed to monitor and log interactions with GitHub Copilot. It provides transparency and traceability for Copilot-assisted development sessions by capturing user inputs and Copilot outputs.
+
+### Aim
+
+- Provide transparency and traceability for Copilot-assisted development.
+- Enable developers to learn from one another by reviewing these logs, fostering unified thought processes within a team.
 
 ## Features
 
@@ -186,16 +192,27 @@ The **Copilot Logger** is a Visual Studio Code extension designed to monitor and
 
 3. **File Writing**
    - Ensures the log file exists before writing.
-   - Opens the log file in the active editor after writing.
+   - Opens the log file in the active editor and writes via the VS Code editor API so new entries are prepended at the top (the log file must be accessible/openable in the editor).
+   - If the editor cannot be shown the extension falls back to a safe `fs` prepend write.
 
 4. **Error Handling**
    - Displays warnings if the `logs/` directory or log file is missing.
    - Handles file writing errors gracefully.
 
+### Copilot Chat Session Scanning
+
+- **Location:** Scans VS Code workspace storage for Copilot chat sessions at `%APPDATA%\\Code\\User\\workspaceStorage\\[workspace-id]\\chatSessions\\`.
+- **Grouping:** Sessions are grouped by their associated workspace (the `workspace-id`) so sessions map to the project/workspace that produced them.
+- **Titles:** Uses custom titles when a session provides one; otherwise it generates a human-friendly title from the session's first message.
+- **Paths:** Resolves and validates workspace paths from stored session configuration so chat sessions can be associated with the correct workspace directory.
+
+Implementation notes: the extension will scan the `workspaceStorage` chat session folders, read session metadata and messages, group sessions by workspace, and surface or export them into the configured logging output (the single consolidated log file by default). This approach provides a reliable source of Copilot chat history without relying on runtime hooks into Copilot.
+
 ## Requirements
 
 - Visual Studio Code version `^1.106.1` or higher.
 - Node.js and npm installed on the system.
+- If multiple logging files do not work as intended, all logs will be consolidated into a single file.
 
 ## Future Enhancements
 
