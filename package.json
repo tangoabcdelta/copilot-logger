@@ -2,7 +2,7 @@
   "name": "copilot-logger",
   "displayName": "Copilot Logger",
   "description": "Logs Copilot interactions (inputs and outputs) into a file for auditing purposes.",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "engines": {
     "vscode": "^1.106.1"
   },
