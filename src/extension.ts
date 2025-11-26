@@ -1,133 +1,156 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as vscode from 'vscode'; // Import the VS Code API for extension development
+import * as fs from 'fs'; // Import the Node.js file system module for file operations
+import * as path from 'path'; // Import the Node.js path module for handling file paths
 
-const LOG_FILE_NAME = 'copilot-activity-log.txt';
+const LOG_FILE_NAME = 'copilot-activity-log.txt'; // Define the name of the log file
 
 class Logger {
-	private readonly logFilePath: string;
-	private warnedMissingDir = false;
-	private warnedMissingFile = false;
+	private readonly logFilePath: string; // Path to the log file
+	private warnedMissingDir = false; // Flag to track if the logs directory warning has been shown
+	private warnedMissingFile = false; // Flag to track if the log file warning has been shown
 
 	constructor(logFilePath: string) {
-		this.logFilePath = logFilePath;
+		this.logFilePath = logFilePath; // Initialize the log file path
 	}
 
 	writeLog(content: string): void {
-		if (!this.ensureResources()) {
-			return;
-		}
+		// if (!this.ensureResources()) { // Ensure the log directory and file exist
+		// 	return; // Exit if resources are missing
+		// }
 
-		const timestamp = new Date().toISOString();
-		const entry = `[${timestamp}] ${content}\n\n`;
+		const timestamp = new Date().toISOString(); // Get the current timestamp
+		const entry = `[${timestamp}] ${content}\n\n`; // Format the log entry
 
 		// Open the document in the editor and prepend the entry at the top
 		vscode.workspace.openTextDocument(this.logFilePath).then((doc) => {
+			console.log(`[DEBUG] opened text document`); // Log success
+			vscode.window.showInformationMessage(`[DEBUG] opened text document`);
+
+			// Show the document in the editor. The `preview: false` option ensures that the document
+			// remains open in a dedicated tab, rather than being replaced if another file is opened.
 			vscode.window.showTextDocument(doc, { preview: false }).then((editor) => {
+
+				// Edit the document by inserting the log entry at the top of the file.
 				editor.edit((editBuilder) => {
-					editBuilder.insert(new vscode.Position(0, 0), entry);
+					editBuilder.insert(new vscode.Position(0, 0), entry); // Insert the log entry at the top
 				}).then((applied) => {
 					if (applied) {
-						console.log(`[DEBUG] Log written to: ${this.logFilePath} (prepended)`);
+						console.log(`[DEBUG] Log written to: ${this.logFilePath} (prepended)`); // Log success
 					} else {
-						console.error('[ERROR] Failed to apply editor edit when writing log entry.');
-						vscode.window.showErrorMessage('Failed to write log entry to editor.');
+						console.error('[ERROR] Failed to apply editor edit when writing log entry.'); // Log failure
+						vscode.window.showErrorMessage('[ERROR] Failed to apply editor edit when writing log entry.'); // Show error message
 					}
+				}, (editErr: unknown) => {
+					// Handle errors that occur during the edit operation.
+					const errorMessage = editErr instanceof Error ? editErr.message : String(editErr);
+					console.error(`[ERROR] Failed to edit document: ${errorMessage}`);
+					vscode.window.showErrorMessage(`Failed to edit document: ${errorMessage}`);
 				});
-			}, (showErr) => {
-				console.warn(`[WARNING] Unable to show log file in editor: ${showErr?.message || showErr}`);
-				// Fallback to direct fs write (prepend)
+			}, (showErr: unknown) => {
+				// Handle errors that occur while showing the document in the editor.
+				const errorMessage = showErr instanceof Error ? showErr.message : String(showErr);
+				console.warn(`[WARNING] Unable to show log file in editor: ${errorMessage}`);
+				vscode.window.showWarningMessage(`[WARNING] Unable to show log file in editor: ${errorMessage}`);
+
+				// Fallback: If the document cannot be shown in the editor, prepend the log entry directly to the file.
 				try {
-					const existingContent = fs.readFileSync(this.logFilePath, 'utf-8');
-					fs.writeFileSync(this.logFilePath, entry + existingContent, 'utf-8');
-					console.log(`[DEBUG] Log written to: ${this.logFilePath} (fs fallback, prepended)`);
-				} catch (fsErr) {
-					const errorMessage = fsErr instanceof Error ? fsErr.message : 'Unknown error';
-					console.error(`[ERROR] Failed to write to log file: ${errorMessage}`);
-					vscode.window.showErrorMessage(`Failed to write to log file: ${errorMessage}.`);
+					const existingContent = fs.readFileSync(this.logFilePath, 'utf-8'); // Read existing content
+					fs.writeFileSync(this.logFilePath, entry + existingContent, 'utf-8'); // Prepend the log entry
+					console.log(`[DEBUG] Log written to: ${this.logFilePath} (fs fallback, prepended)`); // Log success
+					vscode.window.showInformationMessage(`[DEBUG] Log written to: ${this.logFilePath} (fs fallback, prepended)`);
+				} catch (fsErr: unknown) {
+					// Handle errors that occur during the fallback file write operation.
+					const fsErrorMessage = fsErr instanceof Error ? fsErr.message : 'Unknown error';
+					console.error(`[ERROR] Failed to write to log file: ${fsErrorMessage}`);
+					vscode.window.showErrorMessage(`[ERROR] Failed to write to log file: ${fsErrorMessage}`);
 				}
 			});
-		}, (openErr) => {
+		}, (openErr: unknown) => {
+			// Handle errors that occur while opening the document.
 			const errorMessage = openErr instanceof Error ? openErr.message : String(openErr);
 			console.warn(`[WARNING] Unable to open log file: ${errorMessage}`);
-			vscode.window.showWarningMessage('Unable to open log file in editor. Ensure the file exists and is accessible.');
+			vscode.window.showWarningMessage(`[WARNING] Unable to open log file: ${errorMessage}`);
 		});
 	}
 
 	private ensureResources(): boolean {
-		const logsDir = path.dirname(this.logFilePath);
-		if (!fs.existsSync(logsDir)) {
-			if (!this.warnedMissingDir) {
-				this.warnedMissingDir = true;
+		const logsDir = path.dirname(this.logFilePath); // Get the directory of the log file
+		if (!fs.existsSync(logsDir)) { // Check if the directory exists
+			if (!this.warnedMissingDir) { // Check if the warning has been shown
+				this.warnedMissingDir = true; // Set the warning flag
 				vscode.window.showWarningMessage(
 					'Logs directory does not exist. Please create a `logs/` folder in your workspace.'
-				);
+				); // Show warning message
 			}
-			return false;
+			return false; // Return false if the directory is missing
 		}
 
-		if (!fs.existsSync(this.logFilePath)) {
-			if (!this.warnedMissingFile) {
-				this.warnedMissingFile = true;
+		if (!fs.existsSync(this.logFilePath)) { // Check if the log file exists
+			if (!this.warnedMissingFile) { // Check if the warning has been shown
+				this.warnedMissingFile = true; // Set the warning flag
 				vscode.window.showWarningMessage(
 					`Log file ${LOG_FILE_NAME} is missing. Create the file inside logs/ to enable logging.`
-				);
+				); // Show warning message
 			}
-			return false;
+			return false; // Return false if the log file is missing
 		}
 
-		return true;
+		return true; // Return true if resources exist
 	}
 
 	private openLogFile(): void {
 		void vscode.workspace.openTextDocument(this.logFilePath).then(
 			(doc) => {
-				void vscode.window.showTextDocument(doc, { preview: false });
+				void vscode.window.showTextDocument(doc, { preview: false }); // Open the log file in the editor
 			},
-			(error) => console.warn(`[WARNING] Unable to open log file: ${error?.message || error}`)
+			(error) => {
+
+			console.warn(`[WARNING] Unable to open log file: ${error?.message || error}`); // Log warning
+			vscode.window.showInformationMessage(`[WARNING] Unable to open log file: ${error?.message || error}`);
+			}
 		);
 	}
 }
 
 class CopilotInteractionHandler {
-	private readonly logger: Logger;
-	private readonly outputChannel: vscode.OutputChannel;
-	private static readonly MAX_MESSAGES = 50;
+	private readonly logger: Logger; // Logger instance for writing logs
+	private readonly outputChannel: vscode.OutputChannel; // Output channel for displaying interactions
+	private static readonly MAX_MESSAGES = 50; // Maximum number of messages to display
 
 	constructor(logger: Logger, outputChannel: vscode.OutputChannel) {
-		this.logger = logger;
-		this.outputChannel = outputChannel;
+		this.logger = logger; // Initialize the logger
+		this.outputChannel = outputChannel; // Initialize the output channel
 	}
 
 	listenForInteractions(context: vscode.ExtensionContext): void {
-		const disposable = vscode.workspace.onDidChangeTextDocument((event) => this.handleDocumentChange(event));
-		context.subscriptions.push(disposable);
+		const disposable = vscode.workspace.onDidChangeTextDocument((event) => this.handleDocumentChange(event)); // Listen for text document changes
+		context.subscriptions.push(disposable); // Add the listener to the context subscriptions
 	}
 
 	private handleDocumentChange(event: vscode.TextDocumentChangeEvent): void {
-		const editor = vscode.window.activeTextEditor;
-		if (!editor || event.document.uri.toString() !== editor.document.uri.toString()) {
-			return;
+		const editor = vscode.window.activeTextEditor; // Get the active text editor
+		if (!editor || event.document.uri.toString() !== editor.document.uri.toString()) { // Check if the event is for the active editor
+			return; // Exit if not
 		}
 
-		const deltaText = event.contentChanges.map((change) => change.text).join('');
-		if (!deltaText) {
-			return;
+		const deltaText = event.contentChanges.map((change) => change.text).join(''); // Get the changed text
+		if (!deltaText) { // Check if there is any changed text
+			return; // Exit if not
 		}
 
-		if (!/copilot/i.test(deltaText)) {
-			return;
+		if (!/copilot/i.test(deltaText)) { // Check if the changed text contains "copilot"
+			return; // Exit if not
 		}
 
-		const snippet = deltaText.trim().replace(/\s+/g, ' ').slice(0, 200);
-		this.logger.writeLog(`Detected Copilot interaction: ${snippet}`);
-		this.appendToOutputChannel(snippet);
+		const snippet = deltaText.trim().replace(/\s+/g, ' ').slice(0, 200); // Format the snippet
+		this.logger.writeLog(`Detected Copilot interaction: ${snippet}`); // Log the interaction
+		this.appendToOutputChannel(snippet); // Append the interaction to the output channel
 	}
 
 	private appendToOutputChannel(message: string): void {
-		const timestamp = new Date().toISOString();
-		this.outputChannel.appendLine(`[${timestamp}] ${message}`);
-		this.outputChannel.show(true); // reveal but don't steal focus
+		const timestamp = new Date().toISOString(); // Get the current timestamp
+		this.outputChannel.appendLine(`[${timestamp}] ${message}`); // Append the message to the output channel
+		this.outputChannel.show(true); // Reveal the output channel
 	}
 }
 
@@ -252,6 +275,7 @@ export function activate(context: vscode.ExtensionContext) {
 		scanner.scanAndLog();
 	} catch (err) {
 		console.warn('[WARNING] Chat session scanner failed:', err instanceof Error ? err.message : err);
+		vscode.window.showInformationMessage(`[WARNING] Chat session scanner failed: ${err instanceof Error ? err.message : err}`);
 	}
 
 	// Command: Hello World
