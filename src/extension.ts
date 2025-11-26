@@ -91,13 +91,12 @@ class Logger {
 
 class CopilotInteractionHandler {
 	private readonly logger: Logger;
-	private popupTimer: NodeJS.Timeout | null = null;
-	private pendingMessages: string[] = [];
-	private static readonly POPUP_DELAY_MS = 2000;
-	private static readonly MAX_MESSAGES = 4;
+	private readonly outputChannel: vscode.OutputChannel;
+	private static readonly MAX_MESSAGES = 50;
 
-	constructor(logger: Logger) {
+	constructor(logger: Logger, outputChannel: vscode.OutputChannel) {
 		this.logger = logger;
+		this.outputChannel = outputChannel;
 	}
 
 	listenForInteractions(context: vscode.ExtensionContext): void {
@@ -122,25 +121,13 @@ class CopilotInteractionHandler {
 
 		const snippet = deltaText.trim().replace(/\s+/g, ' ').slice(0, 200);
 		this.logger.writeLog(`Detected Copilot interaction: ${snippet}`);
-		this.queuePopup(snippet);
+		this.appendToOutputChannel(snippet);
 	}
 
-	private queuePopup(message: string): void {
-		this.pendingMessages.push(message);
-		if (this.pendingMessages.length > CopilotInteractionHandler.MAX_MESSAGES) {
-			this.pendingMessages.shift();
-		}
-
-		if (this.popupTimer) {
-			clearTimeout(this.popupTimer);
-		}
-
-		this.popupTimer = setTimeout(() => {
-			const content = this.pendingMessages.join('\n');
-			vscode.window.showInformationMessage(`Copilot interactions:\n${content}`);
-			this.pendingMessages = [];
-			this.popupTimer = null;
-		}, CopilotInteractionHandler.POPUP_DELAY_MS);
+	private appendToOutputChannel(message: string): void {
+		const timestamp = new Date().toISOString();
+		this.outputChannel.appendLine(`[${timestamp}] ${message}`);
+		this.outputChannel.show(true); // reveal but don't steal focus
 	}
 }
 
@@ -249,7 +236,12 @@ export function activate(context: vscode.ExtensionContext) {
 	const logDir = path.join(workspaceFolder.uri.fsPath, 'logs');
 	const logFilePath = path.join(logDir, LOG_FILE_NAME);
 	const logger = new Logger(logFilePath);
-	const copilotHandler = new CopilotInteractionHandler(logger);
+
+	// Create output channel for Copilot interactions (replaces popups)
+	const outputChannel = vscode.window.createOutputChannel('Copilot Logger');
+	context.subscriptions.push(outputChannel);
+
+	const copilotHandler = new CopilotInteractionHandler(logger, outputChannel);
 
 	logger.writeLog('Copilot Logger activated.');
 	copilotHandler.listenForInteractions(context);
@@ -262,10 +254,45 @@ export function activate(context: vscode.ExtensionContext) {
 		console.warn('[WARNING] Chat session scanner failed:', err instanceof Error ? err.message : err);
 	}
 
-	const disposable = vscode.commands.registerCommand('copilot-logger.helloWorld', () => {
+	// Command: Hello World
+	const helloWorldCmd = vscode.commands.registerCommand('copilot-logger.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from Copilot Logger!');
 	});
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(helloWorldCmd);
+
+	// Command: Create Log Resources
+	const createLogResourcesCmd = vscode.commands.registerCommand('copilot-logger.createLogResources', async () => {
+		try {
+			if (!fs.existsSync(logDir)) {
+				fs.mkdirSync(logDir, { recursive: true });
+				console.log(`[DEBUG] Created logs directory: ${logDir}`);
+			}
+			if (!fs.existsSync(logFilePath)) {
+				fs.writeFileSync(logFilePath, '', 'utf-8');
+				console.log(`[DEBUG] Created log file: ${logFilePath}`);
+			}
+			vscode.window.showInformationMessage(`Log resources created at: ${logDir}`);
+			// Open the log file in the editor
+			const doc = await vscode.workspace.openTextDocument(logFilePath);
+			await vscode.window.showTextDocument(doc, { preview: false });
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			vscode.window.showErrorMessage(`Failed to create log resources: ${msg}`);
+		}
+	});
+	context.subscriptions.push(createLogResourcesCmd);
+
+	// Command: Import Chat Sessions
+	const importChatSessionsCmd = vscode.commands.registerCommand('copilot-logger.importChatSessions', () => {
+		try {
+			scanner.scanAndLog();
+			vscode.window.showInformationMessage('Chat sessions imported successfully.');
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			vscode.window.showErrorMessage(`Failed to import chat sessions: ${msg}`);
+		}
+	});
+	context.subscriptions.push(importChatSessionsCmd);
 
 	console.log('[DEBUG] Copilot Logger extension activated.');
 }

@@ -16,6 +16,14 @@
       {
         "command": "copilot-logger.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "copilot-logger.createLogResources",
+        "title": "Copilot Logger: Create Log Resources"
+      },
+      {
+        "command": "copilot-logger.importChatSessions",
+        "title": "Copilot Logger: Import Chat Sessions"
       }
     ]
   },

@@ -4,34 +4,30 @@
 
 ### Unresolved / In-Progress
 
-1. **Debounced Popup Not Working**
-   - Issue: The debounced popup mechanism does not reliably aggregate actions into a single popup — users still see multiple notifications in some scenarios.
-   - Status: In progress. Needs further debugging and possibly a different approach (use an output channel or status bar item rather than `showInformationMessage`).
-
-2. **Dynamic Log File Creation / Missing Log Resource**
-   - Issue: Automatic creation and use of multiple log files caused clutter; the current single-file approach still depends on users creating a `logs/` directory and the `copilot-activity-log.txt` file in some environments.
-   - Status: In progress. Extension currently warns once when resources are missing; consider adding an explicit command to create resources or an onboarding prompt.
-
-3. **Excessive Popups (UX)**n+   - Issue: Users reported too many popups earlier; the debounce helps but UX is still noisy for some flows.
-   - Status: In progress. Consider switching to a non-modal notification method.
-
-4. **Workspace Trust and Permissions**
+1. **Workspace Trust and Permissions**
    - Issue: File writing operations fail in untrusted workspaces or directories without write permissions.
    - Status: In progress. Extension detects untrusted state and warns, but workflow for enabling logging needs documentation and user guidance.
 
-5. **F5 Debugging Opens Empty Directory**
-   - Issue: Pressing F5 (launching extension debug) opens an empty directory instead of the intended workspace folder, interrupting debugging and tests.
-   - Status: Unresolved. Requires investigation of `.vscode/launch.json` and `--extensionDevelopmentPath` usage; currently blocks smooth debug cycles.
-
-
 ### Resolved / Addressed
+
+1. **F5 Debugging Opens Empty Directory**
+   - Issue: Pressing F5 (launching extension debug) opened an empty directory instead of the intended workspace folder.
+   - Resolution: Fixed `.vscode/launch.json` to use `${workspaceFolder}` for `--extensionDevelopmentPath` and added the workspace folder as an argument so the debug session opens the correct project.
+
+2. **Debounced Popup Not Working / Excessive Popups (UX)**
+   - Issue: The debounced popup mechanism did not reliably aggregate actions; users saw multiple noisy notifications.
+   - Resolution: Replaced modal popups with a dedicated **Output Channel** (`Copilot Logger`) that aggregates interactions without interrupting workflow.
+
+3. **Dynamic Log File Creation / Missing Log Resource**
+   - Issue: Users had to manually create `logs/` directory and `copilot-activity-log.txt`.
+   - Resolution: Added command `copilot-logger.createLogResources` which creates both resources automatically and opens the log file in the editor.
+
+4. **On-Demand Chat Session Import**
+   - Issue: Chat session scanning only ran at activation; users couldn't re-import.
+   - Resolution: Added command `copilot-logger.importChatSessions` to trigger `ChatSessionScanner.scanAndLog()` on demand.
 
 ## Next Steps / Todos
 
-- [ ] Inspect and fix `.vscode/launch.json` so F5 opens the intended workspace folder (ensure `--extensionDevelopmentPath` and `program` paths are correct for Windows paths).
-- [ ] Add a command `copilot-logger.createLogResources` to create `logs/` and `copilot-activity-log.txt` automatically (with a confirmation prompt) for users who want convenience.
-- [ ] Add a command `copilot-logger.importChatSessions` to run `ChatSessionScanner.scanAndLog()` on demand and to re-run scans as needed.
-- [ ] Replace modal popups with a quieter UX: implement an output channel and/or a status bar indicator to surface aggregated Copilot interactions.
 - [ ] Improve session-to-workspace path resolution by inspecting stored session metadata formats and mapping `workspace-id` to actual workspace paths when possible.
 - [ ] Add unit/integration tests for `ChatSessionScanner` and `Logger` (simulate workspaceStorage inputs) and add a CI job to run lint/tests.
 - [ ] Add user-facing documentation / onboarding that explains how to enable logging, create resources, and privacy considerations.
