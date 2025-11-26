@@ -211,4 +211,11 @@ For detailed test results, refer to the output in the Debug Console or the termi
 
 ---
 
+### Logging and Notifications
+
+- **Centralized Logging**: All `console` calls have been replaced with `LoggerUtility` methods to ensure consistent logging and optional user notifications.
+- **Rationale**: This change reduces redundancy and ensures that logging behavior is configurable via environment variables (`LOG_TO_CONSOLE`, `SHOW_POPUPS`).
+
+---
+
 For any questions or issues, please refer to the project repository or contact the maintainers.

@@ -207,3 +207,10 @@ Implementation notes: the extension will scan the `workspaceStorage` chat sessio
 
 - Add configurable settings for log file location and format.
 - Support for filtering specific Copilot interactions.
+
+---
+
+### Codebase Improvements
+
+- **Centralized Logging**: Introduced `LoggerUtility` to handle all logging and notifications, ensuring consistency and configurability.
+- **Rationale**: This change simplifies the codebase, reduces duplication, and allows users to control logging behavior through environment variables.

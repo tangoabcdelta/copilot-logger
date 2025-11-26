@@ -6,20 +6,33 @@ import { CopilotInteractionHandler } from "./handlers/CopilotInteractionHandler"
 import { ChatSessionScanner } from "./handlers/ChatSessionScanner";
 import { CopilotLoggerTreeDataProvider } from "./views/CopilotLoggerTreeDataProvider";
 import { CopilotChatInterceptor } from "./handlers/CopilotChatInterceptor";
+import { LoggerUtility } from "./utils/LoggerUtility";
 
 const LOG_FILE_NAME = "copilot-activity-log.txt"; // Define the name of the log file
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("[DEBUG] Activating Copilot Logger extension...");
-  vscode.window.showInformationMessage(
-    "[DEBUG] Activating Copilot Logger extension..."
-  );
+  LoggerUtility.logInfo("[DEBUG] Activating Copilot Logger extension...");
 
   // Initialize and scan chat sessions before workspace checks
   const interceptor = new CopilotChatInterceptor((interaction) => {
-    console.log(`Intercepted Copilot interaction: ${interaction}`);
+    LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
   });
   interceptor.listenForInteractions(context);
+
+  // Initialize ChatSessionScanner with a known location for chat storage
+  const chatStoragePath = path.join(
+    process.env.HOME || process.env.USERPROFILE || "",
+    ".copilot-chats"
+  );
+  const scanner = new ChatSessionScanner(new Logger(chatStoragePath));
+
+  try {
+    scanner.logScannedSessions();
+  } catch (err) {
+    LoggerUtility.logWarning(
+      `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
+    );
+  }
 
   // Workspace-related checks for logging functionality
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -31,21 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
     const logDir = path.join(workspaceFolder, "logs");
     const logFilePath = path.join(workspaceFolder, "logs", LOG_FILE_NAME);
     const logger = new Logger(logFilePath);
-    const scanner = new ChatSessionScanner(logger);
-
-    try {
-      scanner.logScannedSessions();
-    } catch (err) {
-      console.warn(
-        "[WARNING] Chat session scanner failed:",
-        err instanceof Error ? err.message : err
-      );
-      vscode.window.showInformationMessage(
-        `[WARNING] Chat session scanner failed: ${
-          err instanceof Error ? err.message : err
-        }`
-      );
-    }
 
     // Create output channel for Copilot interactions (replaces popups)
     const outputChannel = vscode.window.createOutputChannel("Copilot Logger");
@@ -54,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
     const copilotHandler = new CopilotInteractionHandler(logger, outputChannel);
 
     logger.writeLog("Copilot Logger activated.");
-    vscode.window.showInformationMessage("Copilot Logger activated.");
+    LoggerUtility.logInfo("Copilot Logger activated.");
     copilotHandler.listenForInteractions(context);
 
     // Command: Create Log Resources

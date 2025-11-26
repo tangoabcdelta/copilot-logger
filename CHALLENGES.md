@@ -30,6 +30,11 @@
    - Issue: File access logic was tightly coupled with interaction handling, making the extension less modular.
    - Resolution: Refactored the codebase to separate concerns. Introduced `CopilotChatInterceptor` for interaction handling and updated `ChatSessionScanner` to focus on scanning.
 
+6. **Centralized Logging**
+   - Issue: Redundant `console` calls and inconsistent logging behavior.
+   - Resolution: Replaced all `console` calls with `LoggerUtility` methods to ensure consistent logging and optional user notifications.
+   - Outcome: Improved maintainability and reduced code duplication.
+
 ## Next Steps / Todos
 
 - [ ] Improve session-to-workspace path resolution by inspecting stored session metadata formats and mapping `workspace-id` to actual workspace paths when possible.
