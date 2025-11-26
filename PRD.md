@@ -148,3 +148,56 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
   - Developer: Deveedutta Maharana
   - Email: deveedutta@gmail.com
+
+---
+
+## Overview
+The **Copilot Logger** is a Visual Studio Code extension designed to monitor and log interactions with GitHub Copilot. It provides transparency and traceability for Copilot-assisted development sessions by capturing user inputs and Copilot outputs.
+
+## Features
+
+1. **Automatic Logging**
+   - Captures all interactions with GitHub Copilot.
+   - Logs are stored in a single file named `copilot-activity-log.txt` located in the `logs/` directory.
+
+2. **Log File Management**
+   - Ensures the `logs/` directory and `copilot-activity-log.txt` file exist.
+   - Displays warnings if the directory or file is missing.
+   - Opens the log file in the active editor after writing to it.
+
+3. **Prepending Logs**
+   - New log entries are prepended to the log file with a timestamp.
+
+4. **Debounced Popups**
+   - Displays a single popup for Copilot queries, aggregating subsequent actions into the same popup.
+
+5. **SOLID Principles**
+   - Refactored code to use a `Logger` class for logging and a `CopilotInteractionHandler` class for handling Copilot-related events.
+
+## How It Works
+
+1. **Activation**
+   - Initializes the `Logger` and `CopilotInteractionHandler` classes.
+   - Writes an activation log entry.
+
+2. **Logging Interactions**
+   - Listens for changes in the active text editor.
+   - Logs interactions containing the keyword "copilot."
+
+3. **File Writing**
+   - Ensures the log file exists before writing.
+   - Opens the log file in the active editor after writing.
+
+4. **Error Handling**
+   - Displays warnings if the `logs/` directory or log file is missing.
+   - Handles file writing errors gracefully.
+
+## Requirements
+
+- Visual Studio Code version `^1.106.1` or higher.
+- Node.js and npm installed on the system.
+
+## Future Enhancements
+
+- Add configurable settings for log file location and format.
+- Support for filtering specific Copilot interactions.
