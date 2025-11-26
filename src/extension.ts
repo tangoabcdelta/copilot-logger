@@ -36,13 +36,16 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Workspace-related checks for logging functionality
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const logDir = workspaceFolder
+    ? path.join(workspaceFolder, "logs")
+    : path.join(process.env.HOME || process.env.USERPROFILE || "", ".copilot-chats");
+  const logFilePath = path.join(logDir, LOG_FILE_NAME);
+
   if (!workspaceFolder) {
     vscode.window.showWarningMessage(
-      "No workspace folder is open. Logging features will be disabled."
+      "No workspace folder is open. Logging features will use the default location."
     );
   } else {
-    const logDir = path.join(workspaceFolder, "logs");
-    const logFilePath = path.join(workspaceFolder, "logs", LOG_FILE_NAME);
     const logger = new Logger(logFilePath);
 
     // Create output channel for Copilot interactions (replaces popups)

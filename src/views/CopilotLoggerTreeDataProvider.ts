@@ -17,11 +17,15 @@ export class CopilotLoggerTreeDataProvider
   }
 
   getChildren(): Thenable<string[]> {
-    const logFilePath = path.join(
-      vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || "",
-      "logs",
-      LOG_FILE_NAME
-    );
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const logFilePath = workspaceFolder
+      ? path.join(workspaceFolder, "logs", LOG_FILE_NAME)
+      : path.join(
+          process.env.HOME || process.env.USERPROFILE || "",
+          ".copilot-chats",
+          LOG_FILE_NAME
+        );
+
     if (!fs.existsSync(logFilePath)) {
       return Promise.resolve(["No log file found."]);
     }

@@ -17,35 +17,30 @@ export class Logger {
     const timestamp = new Date().toISOString();
     const entry = `[${timestamp}] ${content}\n\n`;
 
-    vscode.workspace.openTextDocument(this.logFilePath).then(
-      (doc) => {
-        vscode.window.showTextDocument(doc, { preview: false }).then(
-          (editor) => {
-            editor.edit((editBuilder) => {
-              editBuilder.insert(new vscode.Position(0, 0), entry);
-            });
-          },
-          (showErr) => {
-            this.fallbackWrite(entry);
-          }
-        );
-      },
-      (openErr) => {
-        this.fallbackWrite(entry);
-      }
-    );
+    // Use fallback write directly to avoid dependency on openTextDocument
+    this.fallbackWrite(entry);
   }
 
   private fallbackWrite(entry: string): void {
     try {
-      const existingContent = fs.existsSync(this.logFilePath)
-        ? fs.readFileSync(this.logFilePath, "utf-8")
-        : "";
-      fs.writeFileSync(this.logFilePath, entry + existingContent, "utf-8");
-    } catch (fsErr) {
-      vscode.window.showErrorMessage(
-        `[ERROR] Failed to write to log file: ${fsErr}`
-      );
+      const dir = path.dirname(this.logFilePath);
+      if (!fs.existsSync(dir)) {
+        if (!this.warnedMissingDir) {
+          vscode.window.showWarningMessage(
+            `Log directory does not exist: ${dir}. Attempting to create it.`
+          );
+          this.warnedMissingDir = true;
+        }
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.appendFileSync(this.logFilePath, entry, "utf-8");
+    } catch (err) {
+      if (!this.warnedMissingFile) {
+        vscode.window.showErrorMessage(
+          `Failed to write to log file: ${this.logFilePath}. Error: ${err}`
+        );
+        this.warnedMissingFile = true;
+      }
     }
   }
 
