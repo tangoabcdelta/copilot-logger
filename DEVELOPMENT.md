@@ -109,6 +109,17 @@ The primary objective of this project was to create a VS Code extension named "C
    - Displays a warning message if no workspace folder is found.
    - Prompts the user with an option to create a default logs directory.
 
+### Refactoring Notes
+
+- **Separation of Concerns:**
+  - Introduced `CopilotChatInterceptor` to handle interaction detection independently of file access.
+  - Refactored `ChatSessionScanner` to separate scanning logic from logging.
+
+- **Updated File Structure:**
+  - `src/handlers/`: Contains logic for interaction handling and scanning.
+  - `src/logger/`: Contains logic for logging to files.
+  - `src/views/`: Contains UI-related components like the TreeDataProvider.
+
 ### Lessons Learned
 
 - Automating repetitive tasks, such as builds, significantly improves the development experience and reduces errors.

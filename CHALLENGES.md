@@ -26,6 +26,10 @@
    - Issue: Chat session scanning only ran at activation; users couldn't re-import.
    - Resolution: Added command `copilot-logger.importChatSessions` to trigger `ChatSessionScanner.scanAndLog()` on demand.
 
+5. **Separation of File Access and Interaction Handling**
+   - Issue: File access logic was tightly coupled with interaction handling, making the extension less modular.
+   - Resolution: Refactored the codebase to separate concerns. Introduced `CopilotChatInterceptor` for interaction handling and updated `ChatSessionScanner` to focus on scanning.
+
 ## Next Steps / Todos
 
 - [ ] Improve session-to-workspace path resolution by inspecting stored session metadata formats and mapping `workspace-id` to actual workspace paths when possible.

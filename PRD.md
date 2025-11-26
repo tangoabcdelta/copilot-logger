@@ -10,49 +10,39 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
 ### Goals
 
-1. **Log User Inputs and Copilot Outputs:**
+1. **Primary Focus on Interaction Interception:**
 
-   - Capture all user requests made to Copilot.
-   - Record Copilot's responses to those requests.
-   - Store the logs in a structured format in a designated `logs/` directory.
+   - Detect and intercept Copilot interactions (inputs and outputs) without relying on file access.
+   - Ensure the extension can function in environments where file writing is restricted.
 
-2. **Automate Logging:**
+2. **Secondary Focus on Logging:**
 
-   - Ensure logging happens automatically without manual intervention.
-   - Create a new log file for each session, uniquely identified by a timestamp.
-
-3. **Provide Session Summaries:**
-
-   - Generate a summary of each session.
-   - Optionally append the summary to Git commit messages.
-
-4. **Maintain Performance:**
-
-   - Ensure the extension does not degrade the performance of VS Code or Copilot.
-
-5. **User-Friendly Configuration:**
-
+   - Provide optional logging capabilities to store intercepted interactions in a structured format.
    - Allow users to configure log file locations and formats.
-   - Provide clear documentation for setup and usage.
+
+3. **Separation of Concerns:**
+
+   - Refactor the codebase to separate interaction handling from file access.
+   - Ensure modularity and maintainability of the code.
 
 ---
 
 ### Features
 
-1. **Logging Mechanism:**
+1. **Interaction Interception:**
 
-   - Automatically capture and log interactions.
-   - Support plain text or JSON log formats.
+   - Detect and intercept interactions with GitHub Copilot.
+   - Support for environments with restricted file writing.
 
-2. **Session Management:**
+2. **Optional Logging:**
 
-   - Create a new log file for each session.
-   - Include metadata such as timestamps and session IDs.
+   - Provide logging capabilities for intercepted interactions.
+   - Allow configuration of log file paths and formats.
 
-3. **Configuration Options:**
+3. **Modular Architecture:**
 
-   - Allow users to specify log file paths.
-   - Enable or disable specific logging features.
+   - Separate modules for interaction handling and file access.
+   - Easy to maintain and extend.
 
 4. **Integration with Git:**
 
@@ -91,14 +81,13 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
    - Generate the base project structure using Yeoman.
    - Initialize Git repository.
 
-2. **Implement Logging Functionality:**
+2. **Implement Interaction Interception:**
 
-   - Capture user inputs and Copilot outputs.
-   - Write logs to files.
+   - Detect and intercept user inputs and Copilot outputs.
 
-3. **Add Configuration Options:**
+3. **Add Optional Logging:**
 
-   - Allow users to customize logging behavior.
+   - Provide logging capabilities for intercepted interactions.
 
 4. **Test and Debug:**
 
@@ -114,7 +103,7 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
 ### Success Metrics
 
-- Logs are generated for 100% of Copilot interactions.
+- Successful interception of 100% of Copilot interactions.
 - No performance degradation in VS Code.
 - Positive feedback from users regarding ease of use and reliability.
 
@@ -124,11 +113,11 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
 1. **Performance Impact:**
 
-   - Optimize logging to minimize overhead.
+   - Optimize interception and logging to minimize overhead.
 
-2. **Incomplete Logs:**
+2. **Incomplete Interceptions:**
 
-   - Implement robust error handling to ensure logs are always written.
+   - Implement robust error handling to ensure interactions are always intercepted.
 
 3. **User Privacy:**
 

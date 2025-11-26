@@ -25,7 +25,24 @@
         "command": "copilot-logger.importChatSessions",
         "title": "Copilot Logger: Import Chat Sessions"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "copilotLoggerSidebar",
+          "title": "Copilot Logger",
+          "icon": "media/kawaii-logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "copilotLoggerSidebar": [
+        {
+          "id": "copilotLoggerView",
+          "name": "Logger View"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run prepackage",

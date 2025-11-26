@@ -11,5 +11,7 @@
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
 	"typescript.tsc.autoDetect": "off",
 	"terminal.integrated.defaultProfile.windows": "Command Prompt",
-	"window.zoomLevel": 0.75
+	"window.zoomLevel": 0.50,
+	"editor.fontFamily": "'Consolas', 'Open Sans Mono', 'Courier New', monospace",
+	"editor.fontLigatures": false
 }
