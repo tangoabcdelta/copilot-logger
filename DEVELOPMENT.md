@@ -216,6 +216,21 @@ For detailed test results, refer to the output in the Debug Console or the termi
 - **Centralized Logging**: All `console` calls have been replaced with `LoggerUtility` methods to ensure consistent logging and optional user notifications.
 - **Rationale**: This change reduces redundancy and ensures that logging behavior is configurable via environment variables (`LOG_TO_CONSOLE`, `SHOW_POPUPS`).
 
+### Logger vs LoggerUtility
+
+- **Logger**:
+  - Handles file-based logging operations.
+  - Writes logs to the `copilot-activity-log.txt` file.
+  - Ensures the log directory and file exist, creating them if necessary.
+  - Used for persistent storage of logs.
+
+- **LoggerUtility**:
+  - Provides utility methods for logging messages to the console and showing popups in the VS Code UI.
+  - Respects environment variables (`LOG_LEVEL`, `LOG_TO_CONSOLE`, `SHOW_POPUPS`) to control log verbosity and behavior.
+  - Does not handle file-based logging.
+
+Use `Logger` for persistent logs and `LoggerUtility` for real-time notifications and debugging.
+
 ---
 
 For any questions or issues, please refer to the project repository or contact the maintainers.

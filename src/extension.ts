@@ -17,6 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
   const interceptor = new CopilotChatInterceptor((interaction) => {
     LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
   });
+
+  LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
   interceptor.listenForInteractions(context);
 
   // Initialize ChatSessionScanner with a known location for chat storage
