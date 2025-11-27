@@ -2,7 +2,7 @@
 
 ## Project: Copilot Logger
 
-### Overview
+### Project Overview
 
 The "Copilot Logger" is a VS Code extension designed to monitor and log interactions with GitHub Copilot. It captures user inputs (requests) and Copilot outputs (responses) and stores them in log files for auditing purposes. This extension aims to provide transparency and traceability for Copilot-assisted development sessions.
 
@@ -27,7 +27,7 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
 ---
 
-### Features
+### Interaction Features
 
 1. **Interaction Interception:**
 
@@ -124,6 +124,14 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
    - Clearly document what data is logged.
    - Allow users to disable logging if desired.
 
+4. **Misuse of Shared Utilities:**
+   - Risk: Shared utilities like `LoggerUtility` were used in standalone scripts, causing dependency issues.
+   - Mitigation: Reverted to standard logging methods (`console.log`) in standalone scripts to maintain independence.
+
+5. **Feature Flag Misconfiguration:**
+   - Risk: Incorrectly set feature flags could disable critical features.
+   - Mitigation: Documented all feature flags in `DEVELOPMENT.md` and added default values in `.env`.
+
 ---
 
 ### Appendix
@@ -140,7 +148,7 @@ The "Copilot Logger" is a VS Code extension designed to monitor and log interact
 
 ---
 
-## Overview
+## Extension Overview
 
 The **Copilot Logger** is a Visual Studio Code extension designed to monitor and log interactions with GitHub Copilot. It provides transparency and traceability for Copilot-assisted development sessions by capturing user inputs and Copilot outputs.
 
@@ -149,7 +157,7 @@ The **Copilot Logger** is a Visual Studio Code extension designed to monitor and
 - Provide transparency and traceability for Copilot-assisted development.
 - Enable developers to learn from one another by reviewing these logs, fostering unified thought processes within a team.
 
-## Features
+## Extension Features
 
 1. **Automatic Logging**
    - Captures all interactions with GitHub Copilot.
@@ -207,6 +215,58 @@ Implementation notes: the extension will scan the `workspaceStorage` chat sessio
 
 - Add configurable settings for log file location and format.
 - Support for filtering specific Copilot interactions.
+
+---
+
+### Recent Updates
+
+#### New Goals
+
+1. **Feature-Based Initialization:**
+   - Introduced a design pattern to initialize features dynamically based on environment variables (feature flags).
+   - Ensures modularity and prevents unnecessary resource allocation.
+
+2. **Improved Workspace Independence:**
+   - Updated the extension to function seamlessly in empty workspaces.
+   - Removed hard dependencies on workspace folders for logging and other features.
+
+3. **Enhanced Debugging and Testing:**
+   - Streamlined the development workflow with updated `launch.json` and `tasks.json` configurations.
+   - Ensured compatibility with empty workspaces during debugging.
+
+#### New Features
+
+1. **Webview for Copilot Chats:**
+   - Added a webview to display past Copilot chat sessions.
+   - Controlled by the `ENABLE_CHAT_WEBVIEW` feature flag.
+
+2. **Dynamic Logging Configuration:**
+   - Logging functionality is now optional and controlled by the `ENABLE_LOGGING` feature flag.
+   - Users can enable or disable logging without modifying the code.
+
+3. **Centralized Logging Utility:**
+   - Replaced redundant `console` calls with `LoggerUtility` for consistent logging.
+   - Supports log levels (`info`, `warn`, `error`) and optional user notifications.
+
+#### Updated Risks and Mitigation
+
+1. **Misuse of Shared Utilities:**
+   - Risk: Shared utilities like `LoggerUtility` were used in standalone scripts, causing dependency issues.
+   - Mitigation: Reverted to standard logging methods (`console.log`) in standalone scripts to maintain independence.
+
+2. **Feature Flag Misconfiguration:**
+   - Risk: Incorrectly set feature flags could disable critical features.
+   - Mitigation: Documented all feature flags in `DEVELOPMENT.md` and added default values in `.env`.
+
+---
+
+### Summary of Changes
+
+#### Goals and Features
+
+- Added dynamic feature initialization.
+- Improved workspace independence.
+- Enhanced debugging and testing workflows.
 
 ---
 

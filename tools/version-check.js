@@ -52,11 +52,10 @@ function checkForChanges() {
   }
 
   if (currentChecksum === previousChecksum) {
-    LoggerUtility.logWarning('No changes detected. Version bump not required.');
+    console.warn('No changes detected. Version bump not required.');
     process.exit(1); // Exit with a warning
   } else {
-    // fs.writeFileSync(checksumFile, currentChecksum); // Commented out to avoid dirtying the Git directory
-    LoggerUtility.logInfo('Changes detected. Bumping version...');
+    console.log('Changes detected. Bumping version...');
     execSync('npm version patch', { stdio: 'inherit' });
   }
 }

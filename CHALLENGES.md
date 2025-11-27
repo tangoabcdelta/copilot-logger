@@ -44,6 +44,12 @@
    - Resolution: Want to use CMD? Go to `settings.json` and add `"terminal.integrated.defaultProfile.windows": "Command Prompt"`
    - Outcome: CMD appears as the default terminal instead of bash.
 
+9. **LoggerUtility Misuse in Standalone Scripts**
+   - Issue: The `version-check.js` script incorrectly used `LoggerUtility` for logging, which is intended for the extension's runtime.
+   - Cause: A side effect of replacing all `console` calls with `LoggerUtility` methods during refactoring.
+   - Resolution: Reverted to using `console.log` and `console.warn` in `version-check.js` to maintain its independence as a standalone script.
+   - Outcome: Prevented unnecessary dependencies and ensured the script remains lightweight and functional.
+
 ### Suppressing Warnings
 
 1. **DeprecationWarning for `punycode`**
