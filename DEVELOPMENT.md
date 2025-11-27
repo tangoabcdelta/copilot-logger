@@ -386,3 +386,5 @@ class FeatureInitializer {
 
 - Use this pattern for any new features that require conditional initialization.
 - Document new feature flags in this file to ensure consistency across the development team.
+
+---
