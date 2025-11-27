@@ -9,12 +9,17 @@ import { ChatSessionScanner } from "./handlers/ChatSessionScanner";
 import { CopilotLoggerTreeDataProvider } from "./views/CopilotLoggerTreeDataProvider";
 import { CopilotChatInterceptor } from "./handlers/CopilotChatInterceptor";
 import { LoggerUtility } from "./utils/LoggerUtility";
+import { CopilotChatWebviewProvider } from './views/CopilotChatWebviewProvider';
 
 dotenv.config(); // Load environment variables from .env file
+console.log("SHOW_POPUPS:", process.env.SHOW_POPUPS);
 
 const LOG_FILE_NAME = "copilot-activity-log.txt"; // Define the name of the log file
+let message = "Hello World";
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {  
+  console.log(message);
+  vscode.window.showInformationMessage(message);
   LoggerUtility.logInfo("[DEBUG] Activating Copilot Logger extension...");
 
   // Initialize ChatSessionScanner with a known location for chat storage
@@ -43,6 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
   LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
   interceptor.listenForInteractions(context);
 
+  LoggerUtility.logInfo(`Workspace-related checks for logging functionality: ${+new Date}`);
   // Workspace-related checks for logging functionality
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   const logDir = workspaceFolder
@@ -119,6 +125,15 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider(
       "copilotLoggerSidebar",
       new CopilotLoggerTreeDataProvider()
+    );
+
+    // Register the webview provider
+    const chatWebviewProvider = new CopilotChatWebviewProvider(context);
+    context.subscriptions.push(
+      vscode.window.registerWebviewViewProvider(
+        CopilotChatWebviewProvider.viewType,
+        chatWebviewProvider
+      )
     );
   }
 }

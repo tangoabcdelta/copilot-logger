@@ -14,26 +14,42 @@
    - Issue: Pressing F5 (launching extension debug) opened an empty directory instead of the intended workspace folder.
    - Resolution: Fixed `.vscode/launch.json` to use `${workspaceFolder}` for `--extensionDevelopmentPath` and added the workspace folder as an argument so the debug session opens the correct project.
 
-2. **Debounced Popup Not Working / Excessive Popups (UX)**
+2. **F5 Debugging Opens Empty VS Code Window**
+   - Issue: Pressing F5 to debug the extension opened a new, empty VS Code window instead of running the extension in the development workspace.
+   - Resolution: Updated `.vscode/launch.json` to remove redundant workspace folder arguments in `args` and corrected the `outFiles` path to match the actual output directory (`out`). This ensured the extension launched correctly during debugging.
+
+3. **Debounced Popup Not Working / Excessive Popups (UX)**
    - Issue: The debounced popup mechanism did not reliably aggregate actions; users saw multiple noisy notifications.
    - Resolution: Replaced modal popups with a dedicated **Output Channel** (`Copilot Logger`) that aggregates interactions without interrupting workflow.
 
-3. **Dynamic Log File Creation / Missing Log Resource**
+4. **Dynamic Log File Creation / Missing Log Resource**
    - Issue: Users had to manually create `logs/` directory and `copilot-activity-log.txt`.
    - Resolution: Added command `copilot-logger.createLogResources` which creates both resources automatically and opens the log file in the editor.
 
-4. **On-Demand Chat Session Import**
+5. **On-Demand Chat Session Import**
    - Issue: Chat session scanning only ran at activation; users couldn't re-import.
    - Resolution: Added command `copilot-logger.importChatSessions` to trigger `ChatSessionScanner.scanAndLog()` on demand.
 
-5. **Separation of File Access and Interaction Handling**
+6. **Separation of File Access and Interaction Handling**
    - Issue: File access logic was tightly coupled with interaction handling, making the extension less modular.
    - Resolution: Refactored the codebase to separate concerns. Introduced `CopilotChatInterceptor` for interaction handling and updated `ChatSessionScanner` to focus on scanning.
 
-6. **Centralized Logging**
+7. **Centralized Logging**
    - Issue: Redundant `console` calls and inconsistent logging behavior.
    - Resolution: Replaced all `console` calls with `LoggerUtility` methods to ensure consistent logging and optional user notifications.
    - Outcome: Improved maintainability and reduced code duplication.
+
+### Suppressing Warnings
+
+1. **DeprecationWarning for `punycode`**
+   - **Issue**: The `punycode` module triggered a deprecation warning during extension activation.
+   - **Attempted Fix**: Used `process.env.NODE_OPTIONS = '--no-deprecation'` to suppress the warning.
+   - **Outcome**: The fix caused compatibility issues and was reverted.
+
+2. **ExperimentalWarning for SQLite**
+   - **Issue**: SQLite triggered an experimental feature warning during extension activation.
+   - **Attempted Fix**: Overrode `process.emitWarning` to suppress the warning.
+   - **Outcome**: The override caused type compatibility issues and was reverted.
 
 ## Next Steps / Todos
 

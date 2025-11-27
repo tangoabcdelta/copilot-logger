@@ -234,3 +234,50 @@ Use `Logger` for persistent logs and `LoggerUtility` for real-time notifications
 ---
 
 For any questions or issues, please refer to the project repository or contact the maintainers.
+
+---
+
+## Debugging Self-Help Guide: Debugging a Webview Extension in Visual Studio Code
+
+**Analogy for Understanding:** Debugging a webview in VS Code using these steps is like opening the hood of a specialized piece of machinery (your extension) that uses a standard, familiar engine (the HTML/CSS/JavaScript web code). Although the machine is inside a larger chassis (VS Code), the tools you use to diagnose the engine (Chrome DevTools) are the same standard tools you use for any typical web engine.
+
+---
+
+This guide provides specific instructions on how to debug a webview extension within Visual Studio Code (VS Code), drawing on the steps described in the sources.
+
+### When to Use This Debugging Method
+
+This method is specifically designed for debugging **a webview extension in Visual Studio Code** that utilizes an HTML page to display its content. If your extension is using an HTML page, this process allows you to inspect and interact with the underlying structure, styling, and scripting.
+
+### The Steps of Debugging a Webview Extension
+
+Follow these steps to initiate the debugging process:
+
+#### Step 1: Run and Open the Extension
+
+First, you must **run the extension and open it** within Visual Studio Code.
+
+#### Step 2: Open Developer Tools
+
+Once the extension is running and visible, you need to open the specialized debugging tools.
+
+1. **Open the command prompt** within the VS Code environment.
+2. From the command prompt, **select the "open webfield developer tools command"**.
+
+#### Step 3: Utilizing Chrome DevTools
+
+Executing the command in Step 2 will immediately **open a Chrome DevTools window**. This window serves as your primary debugging interface.
+
+### What to Use (Debugging Tools and Techniques)
+
+The experience of debugging the webview within Chrome DevTools is described as being **"pretty much the same as a normal html page"**. You have access to the standard tools expected when debugging web content:
+
+| Debugging Tool/Action   | Purpose and Application                                                                 |
+|-------------------------|-----------------------------------------------------------------------------------------|
+| **Select Element Button** | This button allows you to **choose any HTML element on the page** for direct inspection. This is useful for identifying structural issues or ensuring the correct elements are being loaded. |
+| **CSS Access**          | You have **access to the CSS** used by the extension. This enables you to inspect, modify, and troubleshoot styling issues. |
+| **JavaScript Access**   | You have **access to the JavaScript** used by the extension. This is crucial for debugging the functional logic and behavior of the webview. |
+
+In essence, using the Chrome DevTools gives you the full capability to analyze the HTML, CSS, and JavaScript that constitute the webview content.
+
+---
