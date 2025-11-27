@@ -106,9 +106,9 @@ export function activate(context: vscode.ExtensionContext) {
     );
     context.subscriptions.push(importChatSessionsCmd);
 
-    // Register the view provider for the custom view
+    // Register the view provider for the custom sidebar
     vscode.window.registerTreeDataProvider(
-      "copilotLoggerView",
+      "copilotLoggerSidebar",
       new CopilotLoggerTreeDataProvider()
     );
   }
