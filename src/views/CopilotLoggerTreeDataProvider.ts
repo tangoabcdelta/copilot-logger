@@ -7,6 +7,7 @@ const LOG_FILE_NAME = "copilot-activity-log.txt";
 export class CopilotLoggerTreeDataProvider
   implements vscode.TreeDataProvider<string>
 {
+     public static readonly viewType = 'copilotLoggerSidebar';
   private _onDidChangeTreeData: vscode.EventEmitter<string | undefined | void> =
     new vscode.EventEmitter<string | undefined | void>();
   readonly onDidChangeTreeData: vscode.Event<string | undefined | void> =

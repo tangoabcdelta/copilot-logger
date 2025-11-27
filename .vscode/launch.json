@@ -14,10 +14,22 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "npm: compile",
-			"internalConsoleOptions": "neverOpen"
+			// "preLaunchTask": "npm: compile", // commented this because it was slow, I will do it manually
+			"internalConsoleOptions": "neverOpen",
+			"env": {
+				"APPDATA": "C:\\Users\\devee\\AppData\\Roaming",
+				"XDG_CONFIG_HOME": "/home/user/.config",
+				"LOG_LEVEL": "info",
+				"LOG_TO_CONSOLE": "true",
+				"SHOW_POPUPS": "true",
+				"NODE_ENV": "development",
+				"ENABLE_CHAT_WEBVIEW": "true",
+				"ENABLE_SIDEBAR": "false",
+				"ENABLE_LOGGING": "false",
+				"ENABLE_INTERCEPTOR": "false"
+			}
 		},
 		{
 			"name": "Debug Tests",
@@ -29,10 +41,22 @@
 				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index.js"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
 			"preLaunchTask": "npm: compile",
-			"internalConsoleOptions": "neverOpen"
+			"internalConsoleOptions": "neverOpen",
+			"env": {
+				"APPDATA": "C:\\Users\\devee\\AppData\\Roaming",
+				"XDG_CONFIG_HOME": "/home/user/.config",
+				"LOG_LEVEL": "info",
+				"LOG_TO_CONSOLE": "true",
+				"SHOW_POPUPS": "true",
+				"NODE_ENV": "development",
+				"ENABLE_CHAT_WEBVIEW": "true",
+				"ENABLE_SIDEBAR": "false",
+				"ENABLE_LOGGING": "false",
+				"ENABLE_INTERCEPTOR": "false"
+			}
 		}
 	]
 }

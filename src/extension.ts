@@ -73,7 +73,7 @@ class FeatureInitializer {
   private initializeSidebar() {
     // Initialize the sidebar view for logs
     vscode.window.registerTreeDataProvider(
-      "copilotLoggerSidebar",
+      CopilotLoggerTreeDataProvider.viewType,
       new CopilotLoggerTreeDataProvider()
     );
   }

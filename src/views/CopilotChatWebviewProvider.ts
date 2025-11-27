@@ -8,13 +8,17 @@ dotenv.config();
 export class CopilotChatWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'copilotLogger.chatWebview';
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(private readonly context: vscode.ExtensionContext) {
+    console.log('CopilotChatWebviewProvider instantiated');
+  }
 
   resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
   ): void {
+
+    console.log('resolveWebviewView called');
     webviewView.webview.options = {
       enableScripts: true,
     };
@@ -23,6 +27,8 @@ export class CopilotChatWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   private getWebviewContent(): string {
+    console.log('getWebviewContent called');
+    
     const appDataPath = process.env.APPDATA || '';
     const chatDir = path.join(appDataPath, 'CopilotChats');
     let chatList = '';

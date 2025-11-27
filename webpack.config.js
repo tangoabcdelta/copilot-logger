@@ -13,6 +13,9 @@ const isDevMode = process.env.NODE_ENV === "development";
 const extensionConfig = {
   target: 'node', // VS Code extensions run in a Node.js-context 📖 -> https://webpack.js.org/configuration/node/
 	mode: isDevMode ? 'development' : 'production', // set mode based on NODE_ENV
+  optimization: {
+    minimize: !isDevMode, // Disable minification in development mode
+  },
   // set this to leave the source code as close as possible to the original (when packaging we set this to 'production')
   // 	mode: 'none',
   
@@ -42,6 +45,13 @@ const extensionConfig = {
             loader: 'ts-loader'
           }
         ]
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'media/[name][ext]'
+        }
       }
     ]
   },
