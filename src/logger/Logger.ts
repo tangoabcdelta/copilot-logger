@@ -45,6 +45,10 @@ export class Logger {
   }
 
   ensureResources(): boolean {
+    if (process.env.ENABLE_LOGGING !== "true") {
+      return false; // Skip resource checks if logging is disabled
+    }
+
     const logsDir = path.dirname(this.logFilePath);
     if (!fs.existsSync(logsDir)) {
       if (!this.warnedMissingDir) {

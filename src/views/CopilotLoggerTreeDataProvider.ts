@@ -17,6 +17,10 @@ export class CopilotLoggerTreeDataProvider
   }
 
   getChildren(): Thenable<string[]> {
+    if (process.env.ENABLE_SIDEBAR !== "true") {
+      return Promise.resolve([]); // Return no children if the sidebar is disabled
+    }
+
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const logFilePath = workspaceFolder
       ? path.join(workspaceFolder, "logs", LOG_FILE_NAME)
