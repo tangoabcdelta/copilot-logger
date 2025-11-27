@@ -315,3 +315,74 @@ The experience of debugging the webview within Chrome DevTools is described as b
 In essence, using the Chrome DevTools gives you the full capability to analyze the HTML, CSS, and JavaScript that constitute the webview content.
 
 ---
+
+### Recent Refactoring: Feature Flags and Initialization
+
+#### Context
+
+To improve modularity and maintainability, we refactored the extension to use feature flags and object-oriented design patterns for initialization. This ensures that only the necessary modules are instantiated based on the environment configuration.
+
+#### Key Changes
+
+1. **Feature Flags:**
+
+   - Introduced feature flags to control the initialization of various components.
+   - Flags include:
+     - `ENABLE_CHAT_WEBVIEW`: Enables the chat webview feature.
+     - `ENABLE_SIDEBAR`: Enables the sidebar view for logs.
+     - `ENABLE_LOGGING`: Enables logging functionality.
+
+2. **Object-Oriented Initialization:**
+
+   - Replaced `if-else` statements with a `FeatureInitializer` class.
+   - The `FeatureInitializer` class encapsulates the initialization logic for each feature.
+   - Features are initialized dynamically based on the active flags.
+
+#### Benefits
+
+- **Modularity:** Each feature's initialization logic is encapsulated, making the code easier to maintain and extend.
+- **Performance:** Prevents unnecessary instantiation of modules when their corresponding features are disabled.
+- **Readability:** Eliminates nested `if-else` blocks, improving code clarity.
+
+#### Implementation Details
+
+- The `FeatureInitializer` class dynamically initializes features based on the `featureFlags` object.
+- Each feature's initialization logic is encapsulated in a private method within the class.
+- The `activate` function creates an instance of `FeatureInitializer` and invokes its `initialize` method.
+
+#### Example
+
+Here is an example of how the `FeatureInitializer` class works:
+
+```typescript
+class FeatureInitializer {
+  constructor(private context: vscode.ExtensionContext) {}
+
+  initialize() {
+    const initializers = [
+      featureFlags.ENABLE_CHAT_WEBVIEW && this.initializeChatWebview,
+      featureFlags.ENABLE_SIDEBAR && this.initializeSidebar,
+      featureFlags.ENABLE_LOGGING && this.initializeLogging,
+    ].filter(Boolean) as (() => void)[];
+
+    initializers.forEach((initializer) => initializer.call(this));
+  }
+
+  private initializeChatWebview() {
+    // Chat webview initialization logic
+  }
+
+  private initializeSidebar() {
+    // Sidebar initialization logic
+  }
+
+  private initializeLogging() {
+    // Logging initialization logic
+  }
+}
+```
+
+#### Future Recommendations
+
+- Use this pattern for any new features that require conditional initialization.
+- Document new feature flags in this file to ensure consistency across the development team.
