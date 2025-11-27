@@ -26,6 +26,7 @@ const featureFlags = {
   ENABLE_CHAT_WEBVIEW: process.env.ENABLE_CHAT_WEBVIEW === 'true', // Enables the chat webview feature
   ENABLE_SIDEBAR: process.env.ENABLE_SIDEBAR === 'true', // Enables the sidebar view for logs
   ENABLE_LOGGING: process.env.ENABLE_LOGGING === 'true', // Enables logging functionality
+  ENABLE_INTERCEPTOR: process.env.ENABLE_INTERCEPTOR === 'true', // Enables chat interception functionality
 };
 
 // Refactored to use a design pattern for feature flag-based initialization
@@ -38,6 +39,7 @@ class FeatureInitializer {
       featureFlags.ENABLE_CHAT_WEBVIEW && this.initializeChatWebview,
       featureFlags.ENABLE_SIDEBAR && this.initializeSidebar,
       featureFlags.ENABLE_LOGGING && this.initializeLogging,
+      featureFlags.ENABLE_INTERCEPTOR && this.initializeChatInterceptor,
     ].filter(Boolean) as (() => void)[];
 
     initializers.forEach((initializer) => initializer.call(this));
@@ -52,6 +54,20 @@ class FeatureInitializer {
         chatWebviewProvider
       )
     );
+  }
+
+  private initializeChatInterceptor() {
+    // Added feature flag check for CopilotChatInterceptor
+    if (featureFlags.ENABLE_LOGGING) {
+      // Initialize the CopilotChatInterceptor to intercept and log Copilot interactions
+      const interceptor = new CopilotChatInterceptor((interaction) => {
+        // Log intercepted Copilot interactions for debugging purposes
+        LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
+      });
+
+      // Start listening for Copilot interactions
+      interceptor.listenForInteractions(this.context);
+    }
   }
 
   private initializeSidebar() {
@@ -142,18 +158,6 @@ export function activate(context: vscode.ExtensionContext) {
   // Activate the extension by initializing features
   const initializer = new FeatureInitializer(context);
   initializer.initialize();
-
-  // Added feature flag check for CopilotChatInterceptor
-  if (featureFlags.ENABLE_LOGGING) {
-    // Initialize the CopilotChatInterceptor to intercept and log Copilot interactions
-    const interceptor = new CopilotChatInterceptor((interaction) => {
-      // Log intercepted Copilot interactions for debugging purposes
-      LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
-    });
-
-    // Start listening for Copilot interactions
-    interceptor.listenForInteractions(context);
-  }
 }
 
 export function deactivate() {

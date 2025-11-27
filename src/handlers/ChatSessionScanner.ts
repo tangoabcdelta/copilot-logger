@@ -22,7 +22,7 @@ export class ChatSessionScanner {
     const storageRoot = path.join(appData, "Code", "User", "workspaceStorage");
     if (!fs.existsSync(storageRoot)) {
       vscode.window.showWarningMessage(
-        `[WARNING] VS Code workspaceStorage not found at ${storageRoot}`
+        `[WARNING] workspaceStorage not found. Chat scanning will be skipped.`
       );
       return [];
     }

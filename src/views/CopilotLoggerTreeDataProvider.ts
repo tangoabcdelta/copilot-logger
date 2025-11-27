@@ -31,7 +31,7 @@ export class CopilotLoggerTreeDataProvider
         );
 
     if (!fs.existsSync(logFilePath)) {
-      return Promise.resolve(["No log file found."]);
+      return Promise.resolve(["No log file found. Logging is disabled."]);
     }
     const logContent = fs.readFileSync(logFilePath, "utf-8");
     const logLines = logContent.split("\n").filter((line) => line.trim());

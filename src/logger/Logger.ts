@@ -54,7 +54,7 @@ export class Logger {
       if (!this.warnedMissingDir) {
         this.warnedMissingDir = true;
         vscode.window.showWarningMessage(
-          "Logs directory does not exist. Please create a `logs/` folder in your workspace."
+          "Logs directory does not exist. Logging will be disabled until the directory is created."
         );
       }
       return false;
