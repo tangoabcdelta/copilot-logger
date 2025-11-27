@@ -39,6 +39,11 @@
    - Resolution: Replaced all `console` calls with `LoggerUtility` methods to ensure consistent logging and optional user notifications.
    - Outcome: Improved maintainability and reduced code duplication.
 
+8. **Windows Shell vs Bash**
+   - Issue: Not sure if it is real yet, but I can keep flipflopping between type of terminals. I use git bash on windows.
+   - Resolution: Want to use CMD? Go to `settings.json` and add `"terminal.integrated.defaultProfile.windows": "Command Prompt"`
+   - Outcome: CMD appears as the default terminal instead of bash.
+
 ### Suppressing Warnings
 
 1. **DeprecationWarning for `punycode`**

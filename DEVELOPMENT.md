@@ -233,6 +233,40 @@ Use `Logger` for persistent logs and `LoggerUtility` for real-time notifications
 
 ---
 
+### Coding Guidelines
+
+To maintain code quality and readability, the following linting rules are enforced using ESLint:
+
+1. **Function Length**:
+   - Functions should not exceed 50 lines of code (excluding comments).
+   - This ensures functions remain focused and easier to understand.
+
+2. **Cyclomatic Complexity**:
+   - Functions should have a maximum cyclomatic complexity of 10.
+   - This helps reduce overly complex logic and improves maintainability.
+
+3. **Maximum Depth**:
+   - Code blocks should not exceed a nesting depth of 4 levels.
+   - This avoids deeply nested structures that are hard to follow.
+
+4. **Maximum Parameters**:
+   - Functions should accept no more than 3 parameters.
+   - This encourages simpler function signatures.
+
+5. **Maximum Statements**:
+   - Functions should contain no more than 15 statements.
+   - This ensures functions remain concise and focused.
+
+These rules are configured in the `.eslintrc.json` file and are automatically checked during development. Run the following command to check for linting issues:
+
+```bash
+npm run lint
+```
+
+Adhering to these guidelines ensures the codebase remains clean, maintainable, and easy to extend.
+
+---
+
 For any questions or issues, please refer to the project repository or contact the maintainers.
 
 ---

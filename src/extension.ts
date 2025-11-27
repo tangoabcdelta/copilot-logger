@@ -17,39 +17,31 @@ console.log("SHOW_POPUPS:", process.env.SHOW_POPUPS);
 const LOG_FILE_NAME = "copilot-activity-log.txt"; // Define the name of the log file
 let message = "Hello World";
 
-export function activate(context: vscode.ExtensionContext) {  
-  console.log(message);
-  vscode.window.showInformationMessage(message);
-  LoggerUtility.logInfo("[DEBUG] Activating Copilot Logger extension...");
+// Feature flag configuration
+const featureFlags = {
+  ENABLE_CHAT_WEBVIEW: process.env.ENABLE_CHAT_WEBVIEW === 'true',
+  ENABLE_SIDEBAR: process.env.ENABLE_SIDEBAR === 'true',
+  ENABLE_LOGGING: process.env.ENABLE_LOGGING === 'true',
+};
 
-  // Initialize ChatSessionScanner with a known location for chat storage
-  const chatStoragePath = path.join(
-    process.env.HOME || process.env.USERPROFILE || "",
-    ".copilot-chats"
+function initializeChatWebview(context: vscode.ExtensionContext) {
+  const chatWebviewProvider = new CopilotChatWebviewProvider(context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      CopilotChatWebviewProvider.viewType,
+      chatWebviewProvider
+    )
   );
-  LoggerUtility.logInfo(`Created chatStoragePath 17: ${chatStoragePath}`);
-  
-  const scanner = new ChatSessionScanner(new Logger(chatStoragePath));
-  LoggerUtility.logInfo(`ChatSessionScanner initialized line 31: ${scanner}`);
+}
 
-  try {
-    scanner.logScannedSessions();
-  } catch (err) {
-    LoggerUtility.logWarning(
-      `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
-    );
-  }
+function initializeSidebar(context: vscode.ExtensionContext) {
+  vscode.window.registerTreeDataProvider(
+    "copilotLoggerSidebar",
+    new CopilotLoggerTreeDataProvider()
+  );
+}
 
-  // Initialize and scan chat sessions before workspace checks
-  const interceptor = new CopilotChatInterceptor((interaction) => {
-    LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
-  });
-
-  LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
-  interceptor.listenForInteractions(context);
-
-  LoggerUtility.logInfo(`Workspace-related checks for logging functionality: ${+new Date}`);
-  // Workspace-related checks for logging functionality
+function initializeLogging(context: vscode.ExtensionContext) {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   const logDir = workspaceFolder
     ? path.join(workspaceFolder, "logs")
@@ -62,16 +54,22 @@ export function activate(context: vscode.ExtensionContext) {
     );
   } else {
     const logger = new Logger(logFilePath);
-
-    // Create output channel for Copilot interactions (replaces popups)
     const outputChannel = vscode.window.createOutputChannel("Copilot Logger");
     context.subscriptions.push(outputChannel);
-
     const copilotHandler = new CopilotInteractionHandler(logger, outputChannel);
+    const scanner = new ChatSessionScanner(logger);
 
     logger.writeLog("Copilot Logger activated.");
     LoggerUtility.logInfo("Copilot Logger activated.");
     copilotHandler.listenForInteractions(context);
+
+    try {
+      scanner.logScannedSessions();
+    } catch (err) {
+      LoggerUtility.logWarning(
+        `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
+      );
+    }
 
     // Command: Create Log Resources
     const createLogResourcesCmd = vscode.commands.registerCommand(
@@ -120,21 +118,53 @@ export function activate(context: vscode.ExtensionContext) {
       }
     );
     context.subscriptions.push(importChatSessionsCmd);
+  }
+}
 
-    // Register the view provider for the custom sidebar
-    vscode.window.registerTreeDataProvider(
-      "copilotLoggerSidebar",
-      new CopilotLoggerTreeDataProvider()
-    );
+export function activate(context: vscode.ExtensionContext) {  
+  console.log(message);
+  vscode.window.showInformationMessage(message);
+  LoggerUtility.logInfo("[DEBUG] Activating Copilot Logger extension...");
 
-    // Register the webview provider
-    const chatWebviewProvider = new CopilotChatWebviewProvider(context);
-    context.subscriptions.push(
-      vscode.window.registerWebviewViewProvider(
-        CopilotChatWebviewProvider.viewType,
-        chatWebviewProvider
-      )
+  // Initialize ChatSessionScanner with a known location for chat storage
+  const chatStoragePath = path.join(
+    process.env.HOME || process.env.USERPROFILE || "",
+    ".copilot-chats"
+  );
+  LoggerUtility.logInfo(`Created chatStoragePath 17: ${chatStoragePath}`);
+  
+  const scanner = new ChatSessionScanner(new Logger(chatStoragePath));
+  LoggerUtility.logInfo(`ChatSessionScanner initialized line 31: ${scanner}`);
+
+  try {
+    scanner.logScannedSessions();
+  } catch (err) {
+    LoggerUtility.logWarning(
+      `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
     );
+  }
+
+  // Initialize and scan chat sessions before workspace checks
+  const interceptor = new CopilotChatInterceptor((interaction) => {
+    LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
+  });
+
+  LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
+  interceptor.listenForInteractions(context);
+
+  LoggerUtility.logInfo(`Workspace-related checks for logging functionality: ${+new Date}`);
+  // Workspace-related checks for logging functionality
+
+  if (featureFlags.ENABLE_CHAT_WEBVIEW) {
+    initializeChatWebview(context);
+  }
+
+  if (featureFlags.ENABLE_SIDEBAR) {
+    initializeSidebar(context);
+  }
+
+  if (featureFlags.ENABLE_LOGGING) {
+    initializeLogging(context);
   }
 }
 
