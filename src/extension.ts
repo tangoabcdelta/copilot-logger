@@ -1,6 +1,8 @@
 import * as vscode from "vscode"; // Import the VS Code API for extension development
 import * as fs from "fs"; // Import the Node.js file system module for file operations
 import * as path from "path"; // Import the Node.js path module for handling file paths
+import * as dotenv from "dotenv";
+
 import { Logger } from "./logger/Logger";
 import { CopilotInteractionHandler } from "./handlers/CopilotInteractionHandler";
 import { ChatSessionScanner } from "./handlers/ChatSessionScanner";
@@ -8,25 +10,22 @@ import { CopilotLoggerTreeDataProvider } from "./views/CopilotLoggerTreeDataProv
 import { CopilotChatInterceptor } from "./handlers/CopilotChatInterceptor";
 import { LoggerUtility } from "./utils/LoggerUtility";
 
+dotenv.config(); // Load environment variables from .env file
+
 const LOG_FILE_NAME = "copilot-activity-log.txt"; // Define the name of the log file
 
 export function activate(context: vscode.ExtensionContext) {
   LoggerUtility.logInfo("[DEBUG] Activating Copilot Logger extension...");
-
-  // Initialize and scan chat sessions before workspace checks
-  const interceptor = new CopilotChatInterceptor((interaction) => {
-    LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
-  });
-
-  LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
-  interceptor.listenForInteractions(context);
 
   // Initialize ChatSessionScanner with a known location for chat storage
   const chatStoragePath = path.join(
     process.env.HOME || process.env.USERPROFILE || "",
     ".copilot-chats"
   );
+  LoggerUtility.logInfo(`Created chatStoragePath 17: ${chatStoragePath}`);
+  
   const scanner = new ChatSessionScanner(new Logger(chatStoragePath));
+  LoggerUtility.logInfo(`ChatSessionScanner initialized line 31: ${scanner}`);
 
   try {
     scanner.logScannedSessions();
@@ -35,6 +34,14 @@ export function activate(context: vscode.ExtensionContext) {
       `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
     );
   }
+
+  // Initialize and scan chat sessions before workspace checks
+  const interceptor = new CopilotChatInterceptor((interaction) => {
+    LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
+  });
+
+  LoggerUtility.logInfo(`listenForInteractions line 21: ${context}`);
+  interceptor.listenForInteractions(context);
 
   // Workspace-related checks for logging functionality
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
