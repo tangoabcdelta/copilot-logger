@@ -1,27 +1,31 @@
+// Import necessary modules and libraries
 import * as vscode from "vscode"; // Import the VS Code API for extension development
 import * as fs from "fs"; // Import the Node.js file system module for file operations
 import * as path from "path"; // Import the Node.js path module for handling file paths
-import * as dotenv from "dotenv";
+import * as dotenv from "dotenv"; // Import dotenv to load environment variables
 
-import { Logger } from "./logger/Logger";
-import { CopilotInteractionHandler } from "./handlers/CopilotInteractionHandler";
-import { ChatSessionScanner } from "./handlers/ChatSessionScanner";
-import { CopilotLoggerTreeDataProvider } from "./views/CopilotLoggerTreeDataProvider";
-import { CopilotChatInterceptor } from "./handlers/CopilotChatInterceptor";
-import { LoggerUtility } from "./utils/LoggerUtility";
-import { CopilotChatWebviewProvider } from './views/CopilotChatWebviewProvider';
+// Import internal modules
+import { Logger } from "./logger/Logger"; // Handles logging functionality
+import { CopilotInteractionHandler } from "./handlers/CopilotInteractionHandler"; // Handles Copilot interactions
+import { ChatSessionScanner } from "./handlers/ChatSessionScanner"; // Scans and logs chat sessions
+import { CopilotLoggerTreeDataProvider } from "./views/CopilotLoggerTreeDataProvider"; // Provides the sidebar view for logs
+import { CopilotChatInterceptor } from "./handlers/CopilotChatInterceptor"; // Intercepts Copilot interactions
+import { LoggerUtility } from "./utils/LoggerUtility"; // Utility for logging and popups
+import { CopilotChatWebviewProvider } from './views/CopilotChatWebviewProvider'; // Provides the chat webview
 
-dotenv.config(); // Load environment variables from .env file
+// Load environment variables from .env file
+dotenv.config();
 console.log("SHOW_POPUPS:", process.env.SHOW_POPUPS);
 
+// Define constants
 const LOG_FILE_NAME = "copilot-activity-log.txt"; // Define the name of the log file
-let message = "Hello World";
+let message = "Hello World"; // Placeholder message for activation
 
 // Feature flag configuration
 const featureFlags = {
-  ENABLE_CHAT_WEBVIEW: process.env.ENABLE_CHAT_WEBVIEW === 'true',
-  ENABLE_SIDEBAR: process.env.ENABLE_SIDEBAR === 'true',
-  ENABLE_LOGGING: process.env.ENABLE_LOGGING === 'true',
+  ENABLE_CHAT_WEBVIEW: process.env.ENABLE_CHAT_WEBVIEW === 'true', // Enables the chat webview feature
+  ENABLE_SIDEBAR: process.env.ENABLE_SIDEBAR === 'true', // Enables the sidebar view for logs
+  ENABLE_LOGGING: process.env.ENABLE_LOGGING === 'true', // Enables logging functionality
 };
 
 // Refactored to use a design pattern for feature flag-based initialization
@@ -29,6 +33,7 @@ class FeatureInitializer {
   constructor(private context: vscode.ExtensionContext) {}
 
   initialize() {
+    // Dynamically initialize features based on active flags
     const initializers = [
       featureFlags.ENABLE_CHAT_WEBVIEW && this.initializeChatWebview,
       featureFlags.ENABLE_SIDEBAR && this.initializeSidebar,
@@ -39,6 +44,7 @@ class FeatureInitializer {
   }
 
   private initializeChatWebview() {
+    // Initialize the chat webview feature
     const chatWebviewProvider = new CopilotChatWebviewProvider(this.context);
     this.context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
@@ -49,6 +55,7 @@ class FeatureInitializer {
   }
 
   private initializeSidebar() {
+    // Initialize the sidebar view for logs
     vscode.window.registerTreeDataProvider(
       "copilotLoggerSidebar",
       new CopilotLoggerTreeDataProvider()
@@ -56,24 +63,25 @@ class FeatureInitializer {
   }
 
   private initializeLogging() {
+    // Initialize logging functionality
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const logDir = workspaceFolder
       ? path.join(workspaceFolder, "logs")
       : path.join(process.env.HOME || process.env.USERPROFILE || "", ".copilot-chats");
     const logFilePath = path.join(logDir, LOG_FILE_NAME);
 
-    const logger = new Logger(logFilePath);
-    const outputChannel = vscode.window.createOutputChannel("Copilot Logger");
+    const logger = new Logger(logFilePath); // Create a logger instance
+    const outputChannel = vscode.window.createOutputChannel("Copilot Logger"); // Create an output channel
     this.context.subscriptions.push(outputChannel);
-    const copilotHandler = new CopilotInteractionHandler(logger, outputChannel);
-    const scanner = new ChatSessionScanner(logger);
+    const copilotHandler = new CopilotInteractionHandler(logger, outputChannel); // Handle Copilot interactions
+    const scanner = new ChatSessionScanner(logger); // Scan and log chat sessions
 
-    logger.writeLog("Copilot Logger activated.");
+    logger.writeLog("Copilot Logger activated."); // Log activation message
     LoggerUtility.logInfo("Copilot Logger activated.");
-    copilotHandler.listenForInteractions(this.context);
+    copilotHandler.listenForInteractions(this.context); // Start listening for interactions
 
     try {
-      scanner.logScannedSessions();
+      scanner.logScannedSessions(); // Log scanned chat sessions
     } catch (err) {
       LoggerUtility.logWarning(
         `Chat session scanner failed: ${err instanceof Error ? err.message : err}`
@@ -114,7 +122,7 @@ class FeatureInitializer {
       "copilot-logger.importChatSessions",
       () => {
         try {
-          scanner.logScannedSessions();
+          scanner.logScannedSessions(); // Log scanned chat sessions
           vscode.window.showInformationMessage(
             "Chat sessions imported successfully."
           );
@@ -131,10 +139,24 @@ class FeatureInitializer {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  // Activate the extension by initializing features
   const initializer = new FeatureInitializer(context);
   initializer.initialize();
+
+  // Added feature flag check for CopilotChatInterceptor
+  if (featureFlags.ENABLE_LOGGING) {
+    // Initialize the CopilotChatInterceptor to intercept and log Copilot interactions
+    const interceptor = new CopilotChatInterceptor((interaction) => {
+      // Log intercepted Copilot interactions for debugging purposes
+      LoggerUtility.logInfo(`Intercepted Copilot interaction: ${interaction}`);
+    });
+
+    // Start listening for Copilot interactions
+    interceptor.listenForInteractions(context);
+  }
 }
 
 export function deactivate() {
+  // Deactivate the extension
   console.log("[DEBUG] Deactivating Copilot Logger extension...");
 }
